@@ -24,7 +24,7 @@ object WordCountBetterSortedDataset {
 
     // Read each line of my book into an Dataset
     import spark.implicits._
-    val input = spark.read.text("data/book.txt").as[Book]
+    val input = spark.read.text("hdfs:///user/maria_dev/spark/book.txt").as[Book]
 
     // Split using a regular expression that extracts words
     val words = input
@@ -42,17 +42,19 @@ object WordCountBetterSortedDataset {
 
     // Show all the results.
     wordCountsSorted.show(wordCountsSorted.count.toInt)
+    
+    wordCountsSorted.write.text("hdfs:///user/maria_dev/spark/job-output")
 
 
     // ANOTHER WAY TO DO IT (Blending RDD's and Datasets)
-    val bookRDD = spark.sparkContext.textFile("hdfs:///user/maria_dev/spark/book.txt")
-    val wordsRDD = bookRDD.flatMap(x => x.split("\\W+"))
-    val wordsDS = wordsRDD.toDS()
+//     val bookRDD = spark.sparkContext.textFile("hdfs:///user/maria_dev/spark/book.txt")
+//     val wordsRDD = bookRDD.flatMap(x => x.split("\\W+"))
+//     val wordsDS = wordsRDD.toDS()
 
-    val lowercaseWordsDS = wordsDS.select(lower($"value").alias("word"))
-    val wordCountsDS = lowercaseWordsDS.groupBy("word").count()
-    val wordCountsSortedDS = wordCountsDS.sort("count")
-    wordCountsSortedDS.show(wordCountsSortedDS.count.toInt)
+//     val lowercaseWordsDS = wordsDS.select(lower($"value").alias("word"))
+//     val wordCountsDS = lowercaseWordsDS.groupBy("word").count()
+//     val wordCountsSortedDS = wordCountsDS.sort("count")
+//     wordCountsSortedDS.show(wordCountsSortedDS.count.toInt)
 
   }
 }
